@@ -2,13 +2,16 @@ package com.example.jc321013.tipcalculator;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
 
-public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener{
+public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener
+, TextWatcher{
 
     private TextView amountText;
     private EditText userInput;
@@ -18,6 +21,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     private TextView totalText;
 
     private NumberFormat percentageFormatter = NumberFormat.getPercentInstance();
+    private NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+    private double percentageValue;
+    private double amountValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +40,22 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         percentageBar.setOnSeekBarChangeListener(this);
 
+        userInput.addTextChangedListener(this);
+
 
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        percentageText.setText(percentageFormatter.format(progress));
+        percentageValue = progress / 100.0;
+        percentageText.setText(percentageFormatter.format(percentageValue));
+
+        double tipValue = amountValue * percentageValue;
+        double totalValue = tipValue + amountValue;
+
+        tipText.setText(currencyFormatter.format(tipValue));
+        totalText.setText(currencyFormatter.format(totalValue));
+
 
     }
 
@@ -49,6 +66,36 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence text, int start, int before, int count) {
+        if(text.length() > 0){
+            double value = Double.parseDouble(text.toString());
+            amountValue = value / 100;
+            amountText.setText(currencyFormatter.format(amountValue));
+
+            double tipValue = amountValue * percentageValue;
+            double totalValue = tipValue + amountValue;
+
+            tipText.setText(currencyFormatter.format(tipValue));
+            totalText.setText(currencyFormatter.format(totalValue));
+
+
+        }else{
+
+        }
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
 
     }
 }
